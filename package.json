@@ -1,15 +1,20 @@
 {
   "name": "react-bem-decorator",
   "version": "1.0.0",
-  "description": "",
+  "description": "react decorator for BEM classNames",
   "main": "index.js",
   "scripts": {
-    "prestart": "npm install && npm test",
-    "start": "onchange 'index.js' 'test' -- npm test",
-    "test": "mocha --reporter spec"
+    "prepublish": "npm run build",
+    "start": "npm run test -- --watch",
+    "test": "mocha --reporter spec --require babel/register",
+    "build": "babel src --out-dir lib"
   },
-  "author": "",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/johannestroeger/react-bem-decorator.git"
+  },
+  "author": "Johannes Troeger <johannes.troeger@gmail.com>",
+  "license": "WTFPL",
   "devDependencies": {
     "babel": "^5.8.23",
     "chai": "^3.2.0",
