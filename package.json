@@ -2,7 +2,7 @@
   "name": "react-bem-decorator",
   "version": "1.0.0",
   "description": "react decorator for BEM classNames",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
     "prepublish": "npm run build",
     "start": "npm run test -- --watch",
