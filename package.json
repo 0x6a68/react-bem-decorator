@@ -1,0 +1,21 @@
+{
+  "name": "react-bem-decorator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "prestart": "npm install && npm test",
+    "start": "onchange 'index.js' 'test' -- npm test",
+    "test": "mocha --reporter spec"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "babel": "^5.8.23",
+    "chai": "^3.2.0",
+    "mocha": "^2.3.2",
+    "onchange": "^2.0.0",
+    "react": "^0.14.0-beta3",
+    "react-addons-test-utils": "^0.14.0-beta3"
+  }
+}
