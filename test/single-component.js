@@ -5,7 +5,20 @@ import BEMDecorator from '../src';
 import shallowRenderComponent from './utils/shallowRenderComponent';
 
 // fixture
-class SimpleFixtureComponent {}
+class SimpleFixtureComponent extends Component {
+    static defaultProps = {
+        foo: 'bar'
+    }
+    render() {
+        return React.createElement('p');
+    }
+}
+
+class ComplexFixtureComponent {
+    render() {
+        return React.createElement('div', {}, this.props.children)
+    }
+}
 const MOCK_SETTINGS = {
     modifiers(props) {
         const { modified } = props;
@@ -25,7 +38,6 @@ function renderComponent(props, setupArgs = MOCK_ARGS) {
         props
     );
 }
-
 describe('single component without inheritance', () => {
 
     it('should set props.BEM', () => {
@@ -53,4 +65,3 @@ describe('single component without inheritance', () => {
     });
 
 });
-
