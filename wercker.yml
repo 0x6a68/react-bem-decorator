@@ -1,0 +1,6 @@
+box: nodesource/4
+build:
+  steps:
+    - npm-install
+    - npm-test
+
