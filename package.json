@@ -6,7 +6,7 @@
   "scripts": {
     "prepublish": "npm run build",
     "start": "npm run test -- --watch",
-    "test": "mocha --reporter spec --require babel/register",
+    "test": "mocha --reporter min --require babel/register --require test/utils/dom.js",
     "build": "babel src --out-dir lib"
   },
   "repository": {
@@ -18,9 +18,11 @@
   "devDependencies": {
     "babel": "^5.8.23",
     "chai": "^3.2.0",
+    "jsdom": "^6.3.0",
     "mocha": "^2.3.2",
     "onchange": "^2.0.0",
-    "react": "^0.14.0-beta3",
-    "react-addons-test-utils": "^0.14.0-beta3"
+    "react": "^0.14.0-rc1",
+    "react-addons-test-utils": "^0.14.0-rc1",
+    "react-dom": "^0.14.0-rc1"
   }
 }

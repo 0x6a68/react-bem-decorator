@@ -66,16 +66,12 @@ function BEMComposer(className, settings = {}) {
 }
 
 export default function BEMDecorator(...args) {
-
-
     const composeBEM = BEMComposer(...args);
 
     return (TargetComponent) => class BEMDecorator extends Component {
 
         render() {
             const { props } = this;
-
-            //console.log('.', props);
             return (
                 <TargetComponent { ...props } BEM={ composeBEM(props) } />
             );

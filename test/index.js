@@ -1,46 +1,52 @@
 import React, { Component } from 'react';
 import { expect } from 'chai';
+import {
+    renderIntoDocument,
+    findRenderedComponentWithType
+} from 'react-addons-test-utils';
+
 import BEMDecorator from '../src';
 
-import shallowRenderComponent from './utils/shallowRenderComponent';
-
 // fixture
-class SimpleFixtureComponent {}
-const MOCK_SETTINGS = {
+class Passthrough extends Component {
+    render() {
+        return <div {...this.props} />;
+    }
+}
+
+@BEMDecorator('mockClassName', {
     modifiers(props) {
         const { modified } = props;
         return { modified };
     },
     elements: [ 'foo', 'bar' ]
-
-};
-const MOCK_ARGS = [
-    'mockClassName',
-    MOCK_SETTINGS
-];
-
-function renderComponent(props, setupArgs = MOCK_ARGS) {
-    return shallowRenderComponent(
-        BEMDecorator(...setupArgs)(SimpleFixtureComponent),
-        props
-    );
+})
+class Container extends Component {
+    render() {
+        return <Passthrough {...this.props} modified />;
+    }
 }
 
+//const BEMComponent = BEMDecorator('stirng', {})(SimpleFixtureComponent);
 describe('single component without inheritance', () => {
+    let stub;
+
+    before(() => {
+        const container = renderIntoDocument(<Container />);
+        stub = findRenderedComponentWithType(container, Passthrough);
+    });
 
     it('should set props.BEM', () => {
-        expect(renderComponent().props.BEM).to.be.a('object');
-        // TODO-150910 test all possible situations
-        expect(renderComponent(null, ['foo']).props.BEM).to.be.a('object');
+        expect(stub.props.BEM).to.be.a('object');
     });
 
     it('should set prop.BEM.className to mockClassName', () => {
-        const { props: { BEM } } = renderComponent();
+        const { props: { BEM } } = stub;
         expect(BEM.className).to.equal('mockClassName');
     });
 
     it('should set props.BEM.elements[foo and bar]', () => {
-        const { props: { BEM } } = renderComponent();
+        const { props: { BEM } } = stub;
 
         expect(BEM.elements).to.be.a('object');
         expect(BEM.elements.foo).to.equal('mockClassName__foo');
@@ -48,7 +54,10 @@ describe('single component without inheritance', () => {
     });
 
     it('should extends props.BEM.className by its modifiers', () => {
-        const { props: { BEM } } = renderComponent({ modified: true });
+        const container = renderIntoDocument(<Container modified />);
+        stub = findRenderedComponentWithType(container, Passthrough);
+
+        const { props: { BEM } } = stub;
         expect(BEM.className).to.equal('mockClassName mockClassName--modified');
     });
 
