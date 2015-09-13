@@ -1,4 +1,9 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
+
+const BEM_ELEMENT_SEPERATOR = '__';
+const BEM_MODIFIER_SEPERATOR = '--';
+const CLASSNAME_KEY = '__BEMClassName__';
+const typesSpec = { [CLASSNAME_KEY]: PropTypes.string };
 
 function _invariant(condition, format = '', ...vars) {
     if (condition) {
@@ -29,7 +34,7 @@ function composeElements(className, elements) {
     }, {});
 }
 
-function composeModifiers(className, modifiers, props) {
+function composeModifiers(className, modifiers, props, context) {
 
     if (!modifiers) {
         return className;
@@ -43,13 +48,13 @@ function composeModifiers(className, modifiers, props) {
 
     const finalClassName = [
         className,
-        finalModifiers.map(([name]) => `${className}--${name}`)
+        finalModifiers.map(([name]) => `${className}${BEM_MODIFIER_SEPERATOR}${name}`)
     ].join(' ');
 
     return finalClassName;
 }
 
-function BEMComposer(className, settings = {}) {
+function BEMComposer(className, settings) {
     _invariant(
         typeof className === 'string',
         'first Argument can not be empty'
@@ -57,23 +62,38 @@ function BEMComposer(className, settings = {}) {
 
     const { elements, modifiers } = settings;
 
-    return (props) => {
+    return (props, context) => {
+        const finalClassName = [context[CLASSNAME_KEY], className]
+            .filter(str => str)
+            .join(BEM_ELEMENT_SEPERATOR)
+
         return {
-            className: composeModifiers(className, modifiers, props),
-            elements: composeElements(className, elements)
+            className: composeModifiers(finalClassName, modifiers, props),
+            elements: composeElements(finalClassName, elements)
         }
     }
 }
 
-export default function BEMDecorator(...args) {
-    const composeBEM = BEMComposer(...args);
+export default function BEMDecorator(className, settings = {}) {
+    const composeBEM = BEMComposer(className, settings);
 
     return (TargetComponent) => class BEMDecorator extends Component {
 
+        static propTypes = typesSpec;
+        static contextTypes = typesSpec;
+        static childContextTypes = typesSpec;
+
+        getChildContext() {
+            return {
+                [CLASSNAME_KEY]: className
+            }
+        }
+
         render() {
-            const { props } = this;
+            const { props, context } = this;
+
             return (
-                <TargetComponent { ...props } BEM={ composeBEM(props) } />
+                <TargetComponent { ...props } BEM={ composeBEM(props, context) } />
             );
         };
     }

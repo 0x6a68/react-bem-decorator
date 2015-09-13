@@ -62,4 +62,3 @@ describe('single component without inheritance', () => {
     });
 
 });
-
