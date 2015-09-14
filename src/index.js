@@ -4,6 +4,9 @@ const BEM_ELEMENT_SEPERATOR = '__';
 const BEM_MODIFIER_SEPERATOR = '--';
 const CLASSNAME_KEY = '__BEMClassName__';
 const typesSpec = { [CLASSNAME_KEY]: PropTypes.string };
+function _uniqueString(value, index, self) {
+    return self.indexOf(value) === index;
+}
 
 function _invariant(condition, format = '', ...vars) {
     if (condition) {
@@ -16,12 +19,12 @@ function _invariant(condition, format = '', ...vars) {
     );
 }
 
-function filterByTruthy(obj) {
+function filterByTruthy(obj, defaultModifiers = []) {
     // poormans Object.entries().filter...
     return Object.keys(obj).reduce((result, key) => {
         const value = obj[key];
-        return (value) ? result.concat([[key, value]]) : result
-    }, []);
+        return (value) ? result.concat([key]) : result
+    }, defaultModifiers);
 }
 
 function composeElements(className, elements) {
@@ -35,12 +38,14 @@ function composeElements(className, elements) {
 }
 
 function composeModifiers(className, modifiers, props, context) {
+    const modifiersAsProp = props.modifiers;
 
-    if (!modifiers) {
-        return className;
-    }
-
-    const finalModifiers = filterByTruthy(modifiers(props));
+    // TODO-150914
+    // oh boy... really ugly
+    const finalModifiers = filterByTruthy(
+        (modifiers) ? modifiers(props) : {},
+        (modifiersAsProp) ? modifiersAsProp.split(' ') : []
+    );
 
     if (!finalModifiers.length) {
         return className;
@@ -48,7 +53,10 @@ function composeModifiers(className, modifiers, props, context) {
 
     const finalClassName = [
         className,
-        finalModifiers.map(([name]) => `${className}${BEM_MODIFIER_SEPERATOR}${name}`)
+        finalModifiers
+            .filter(_uniqueString)
+            .map((name) => `${className}${BEM_MODIFIER_SEPERATOR}${name}`)
+            .join(' ')
     ].join(' ');
 
     return finalClassName;
@@ -68,11 +76,11 @@ function BEMComposer(className, settings) {
     const { elements, modifiers, isBlock } = settings;
 
     return (props, context) => {
-
         const finalClassName =
             (isBlock)
             ? className
             : composeFinalClassName(context[CLASSNAME_KEY], className);
+
 
         return {
             className: composeModifiers(finalClassName, modifiers, props),

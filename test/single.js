@@ -23,7 +23,16 @@ class Passthrough extends Component {
 })
 class Container extends Component {
     render() {
-        return <Passthrough {...this.props} modified />;
+        return <Passthrough {...this.props} />;
+    }
+}
+
+@BEMDecorator('mockClassName', {
+    elements: [ 'foo', 'bar' ]
+})
+class ContainerWithoutModifierFunc extends Component {
+    render() {
+        return <Passthrough {...this.props} />;
     }
 }
 
@@ -55,6 +64,37 @@ describe('single component without inheritance', () => {
 
     it('should extends props.BEM.className by its modifiers', () => {
         const container = renderIntoDocument(<Container modified />);
+        stub = findRenderedComponentWithType(container, Passthrough);
+
+        const { props: { BEM } } = stub;
+        expect(BEM.className).to.equal('mockClassName mockClassName--modified');
+    });
+
+    it('should handle a property modifers', () => {
+
+        const container = renderIntoDocument(<Container modifiers="foo bar" />);
+        stub = findRenderedComponentWithType(container, Passthrough);
+
+        const { props: { BEM } } = stub;
+        expect(BEM.className).to.equal(
+            'mockClassName mockClassName--foo mockClassName--bar');
+    });
+
+    it('should handle a duplicate modifers', () => {
+
+        const container = renderIntoDocument(<Container modified modifiers="modified" />);
+        stub = findRenderedComponentWithType(container, Passthrough);
+
+        const { props: { BEM } } = stub;
+        expect(BEM.className).to.not.equal(
+            'mockClassName mockClassName--modified mockClassName--modified'
+        );
+        expect(BEM.className).to.equal('mockClassName mockClassName--modified');
+    });
+
+    it('should set modifier classnames even no modifier func is defined', () => {
+
+        const container = renderIntoDocument(<ContainerWithoutModifierFunc modifiers="modified" />);
         stub = findRenderedComponentWithType(container, Passthrough);
 
         const { props: { BEM } } = stub;
