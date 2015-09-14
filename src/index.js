@@ -1,87 +1,47 @@
 import React, { Component, PropTypes } from 'react';
 
+import {
+    invoke,
+    concatAndFilterString,
+    invariant,
+    filterByTruthy
+} from './utils'
+
 const BEM_ELEMENT_SEPERATOR = '__';
 const BEM_MODIFIER_SEPERATOR = '--';
+const EMPTY_SEPERATOR = ' ';
 const CLASSNAME_KEY = '__BEMClassName__';
 const typesSpec = { [CLASSNAME_KEY]: PropTypes.string };
 
-function _uniqueString(value, index, self) {
-    return self.indexOf(value) === index;
-}
-
-function _invariant(condition, format = '', ...vars) {
-    if (condition) {
-        return;
-    }
-
-    let index = 0;
-    throw new Error(
-        `Invariant Violation: ${format.replace(/%s/g, () => vars[index++])}`
-    );
-}
-
-function filterByTruthy(objOrArr, defaultModifiers = []) {
-    // poormans Object.entries().filter...
-    if (Array.isArray(objOrArr)) {
-        return objOrArr;
-    }
-    return Object.keys(objOrArr).reduce((result, key) => {
-        const value = objOrArr[key];
-        return (value) ? result.concat([key]) : result
-    }, defaultModifiers);
-}
-
-function composeElements(className, elements) {
+const composeElements = (className, elements) => {
     if (!elements) {
         return;
     }
     return elements.reduce((result, value) => {
-        result[value] = `${className}__${value}`;
+        result[value] = composeElement(className, value);
         return result;
     }, {});
 }
 
-function composeModifiers(className, modifiers, props, context) {
+const composeEmpty = concatAndFilterString(EMPTY_SEPERATOR);
+const composeElement = concatAndFilterString(BEM_ELEMENT_SEPERATOR);
+const composeModifier = concatAndFilterString(BEM_MODIFIER_SEPERATOR);
+
+const composeStates = (fn, args) => composeEmpty(...filterByTruthy(invoke(fn, args)));
+const composeModifiers = (fn, props) => {
     const modifiersAsProp = props.modifiers;
+    const finalModifiers = filterByTruthy(invoke(fn, props)).concat(
+        (modifiersAsProp) ? modifiersAsProp.split(' ') : null
+    ).filter(str => str);
 
-    // TODO-150914
-    // oh boy... really ugly
-    const finalModifiers = filterByTruthy(
-        (modifiers) ? modifiers(props) : {},
-        (modifiersAsProp) ? modifiersAsProp.split(' ') : []
-    );
-
-    if (!finalModifiers.length) {
-        return className;
-    }
-
-    const finalClassName = [
-        className,
-        finalModifiers
-            .filter(_uniqueString)
-            .map((name) => `${className}${BEM_MODIFIER_SEPERATOR}${name}`)
-            .join(' ')
-    ].join(' ');
-
-    return finalClassName;
-}
-
-function composeStates(className, states, props) {
-    const finalStates = filterByTruthy(
-        (states) ? states(props) : {}
-    );
-
-    const finalClassName = finalStates.map(name => `${name}`).join(' ');
-
-    return finalClassName;
-}
-
-function composeFinalClassName(...strings) {
-    return strings.filter(str => str).join(BEM_ELEMENT_SEPERATOR);
+    return (className) =>
+        composeEmpty(
+            ...finalModifiers.map((name) => composeModifier(className, name))
+        )
 }
 
 function BEMComposer(className, settings) {
-    _invariant(
+    invariant(
         typeof className === 'string',
         `className must be a string, can not be %s`,
         typeof className
@@ -90,21 +50,22 @@ function BEMComposer(className, settings) {
     const { elements, modifiers, states, isBlock} = settings;
 
     return (props, context) => {
-        const finalClassName =
+
+        const baseClassName =
             (isBlock)
             ? className
-            : composeFinalClassName(context[CLASSNAME_KEY], className);
+            : composeElement(context[CLASSNAME_KEY], className);
 
         const originalClassName = props.className;
 
         return {
-            className: [
+            className: composeEmpty(
                 originalClassName,
-                composeModifiers(finalClassName, modifiers, props),
-                composeStates(finalClassName, states, props)
-            ].filter(str => str)
-            .join(' '),
-            elements: composeElements(finalClassName, elements)
+                baseClassName,
+                composeModifiers(modifiers, props)(baseClassName),
+                composeStates(states, props)
+            ),
+            elements: composeElements(baseClassName, elements)
         }
     }
 }
@@ -125,7 +86,7 @@ export default function BEMDecorator(className, settings = {}) {
             return {
                 [CLASSNAME_KEY]: (isBlock)
                     ? className
-                    : composeFinalClassName(currentClassName, className)
+                    : composeElement(currentClassName, className)
             }
         }
 
