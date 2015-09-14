@@ -68,9 +68,7 @@ function composeStates(className, states, props) {
         (states) ? states(props) : {}
     );
 
-    const finalClassName = [
-        finalStates.map(name => `${name}`)
-    ].join(' ');
+    const finalClassName = finalStates.map(name => `${name}`).join(' ');
 
     return finalClassName;
 }

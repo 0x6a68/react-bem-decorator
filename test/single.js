@@ -31,14 +31,6 @@ class Container extends Component {
     }
 }
 
-@BEMDecorator('mockClassName', {
-    elements: [ 'foo', 'bar' ]
-})
-class ContainerWithoutModifierFunc extends Component {
-    render() {
-        return <Passthrough {...this.props} />;
-    }
-}
 
 //const BEMComponent = BEMDecorator('stirng', {})(SimpleFixtureComponent);
 describe('single component without inheritance', () => {
@@ -97,6 +89,14 @@ describe('single component without inheritance', () => {
     });
 
     it('should set modifier classnames even no modifier func is defined', () => {
+        @BEMDecorator('mockClassName', {
+            elements: [ 'foo', 'bar' ]
+        })
+        class ContainerWithoutModifierFunc extends Component {
+            render() {
+                return <Passthrough {...this.props} />;
+            }
+        }
         const container = renderIntoDocument(<ContainerWithoutModifierFunc modifiers="modified" />);
         stub = findRenderedComponentWithType(container, Passthrough);
 
@@ -112,12 +112,33 @@ describe('single component without inheritance', () => {
         expect(BEM.className).to.equal('container mockClassName');
     });
 
-    it('should prepend components className', () => {
+    it('should use state function', () => {
         const container = renderIntoDocument(<Container active />);
         stub = findRenderedComponentWithType(container, Passthrough);
 
         const { props: { BEM } } = stub;
         expect(BEM.className).to.equal('mockClassName active');
+    });
+
+    it('should use only states', () => {
+        @BEMDecorator('', {
+            states(props) {
+                const { active, disabled } = props;
+                return {
+                    active, disabled
+                }
+            }
+        })
+        class Container extends Component {
+            render() {
+                return <Passthrough {...this.props} />;
+            }
+        }
+        const container = renderIntoDocument(<Container active disabled/>);
+        stub = findRenderedComponentWithType(container, Passthrough);
+
+        const { props: { BEM } } = stub;
+        expect(BEM.className).to.equal('active disabled');
     });
 
 });
