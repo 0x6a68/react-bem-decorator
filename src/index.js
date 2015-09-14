@@ -91,8 +91,13 @@ export default function BEMDecorator(className, settings = {}) {
         static childContextTypes = typesSpec;
 
         getChildContext() {
+            const { isBlock } = settings;
+            const currentClassName = this.context[CLASSNAME_KEY];
+
             return {
-                [CLASSNAME_KEY]: className
+                [CLASSNAME_KEY]: (isBlock)
+                    ? className
+                    : composeFinalClassName(currentClassName, className)
             }
         }
 
