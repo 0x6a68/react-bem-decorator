@@ -19,6 +19,10 @@ class Passthrough extends Component {
         const { modified } = props;
         return { modified };
     },
+    states(props) {
+        const { active } = props;
+        return { active };
+    },
     elements: [ 'foo', 'bar' ]
 })
 class Container extends Component {
@@ -106,6 +110,14 @@ describe('single component without inheritance', () => {
 
         const { props: { BEM } } = stub;
         expect(BEM.className).to.equal('container mockClassName');
+    });
+
+    it('should prepend components className', () => {
+        const container = renderIntoDocument(<Container active />);
+        stub = findRenderedComponentWithType(container, Passthrough);
+
+        const { props: { BEM } } = stub;
+        expect(BEM.className).to.equal('mockClassName active');
     });
 
 });

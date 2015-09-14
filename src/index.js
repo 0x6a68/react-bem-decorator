@@ -4,6 +4,7 @@ const BEM_ELEMENT_SEPERATOR = '__';
 const BEM_MODIFIER_SEPERATOR = '--';
 const CLASSNAME_KEY = '__BEMClassName__';
 const typesSpec = { [CLASSNAME_KEY]: PropTypes.string };
+
 function _uniqueString(value, index, self) {
     return self.indexOf(value) === index;
 }
@@ -62,6 +63,18 @@ function composeModifiers(className, modifiers, props, context) {
     return finalClassName;
 }
 
+function composeStates(className, states, props) {
+    const finalStates = filterByTruthy(
+        (states) ? states(props) : {}
+    );
+
+    const finalClassName = [
+        finalStates.map(name => `${name}`)
+    ].join(' ');
+
+    return finalClassName;
+}
+
 function composeFinalClassName(...strings) {
     return strings.filter(str => str).join(BEM_ELEMENT_SEPERATOR);
 }
@@ -73,7 +86,7 @@ function BEMComposer(className, settings) {
         typeof className
     );
 
-    const { elements, modifiers, isBlock } = settings;
+    const { elements, modifiers, states, isBlock} = settings;
 
     return (props, context) => {
         const finalClassName =
@@ -86,7 +99,8 @@ function BEMComposer(className, settings) {
         return {
             className: [
                 originalClassName,
-                composeModifiers(finalClassName, modifiers, props)
+                composeModifiers(finalClassName, modifiers, props),
+                composeStates(finalClassName, states, props)
             ].filter(str => str)
             .join(' '),
             elements: composeElements(finalClassName, elements)
