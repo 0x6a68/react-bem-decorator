@@ -1,6 +1,6 @@
 {
   "name": "react-bem-decorator",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "react decorator for BEM classNames",
   "main": "lib/index.js",
   "scripts": {
