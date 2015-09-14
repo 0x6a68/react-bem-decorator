@@ -54,18 +54,25 @@ function composeModifiers(className, modifiers, props, context) {
     return finalClassName;
 }
 
+function composeFinalClassName(...strings) {
+    return strings.filter(str => str).join(BEM_ELEMENT_SEPERATOR);
+}
+
 function BEMComposer(className, settings) {
     _invariant(
         typeof className === 'string',
-        'first Argument can not be empty'
+        `className must be a string, can not be %s`,
+        typeof className
     );
 
-    const { elements, modifiers } = settings;
+    const { elements, modifiers, isBlock } = settings;
 
     return (props, context) => {
-        const finalClassName = [context[CLASSNAME_KEY], className]
-            .filter(str => str)
-            .join(BEM_ELEMENT_SEPERATOR)
+
+        const finalClassName =
+            (isBlock)
+            ? className
+            : composeFinalClassName(context[CLASSNAME_KEY], className);
 
         return {
             className: composeModifiers(finalClassName, modifiers, props),

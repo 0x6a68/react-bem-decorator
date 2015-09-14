@@ -15,6 +15,7 @@ class Passthrough extends Component {
 }
 
 @BEMDecorator('mockClassName', {
+    isBlock: true,
     modifiers(props) {
         const { modified } = props;
         return { modified };
@@ -28,6 +29,7 @@ class Parent extends Component {
 }
 
 @BEMDecorator('mockChildClassName', {
+    isBlock: true,
     modifiers(props) {
         const { modified } = props;
         return { modified };
@@ -49,29 +51,14 @@ describe('parent child using context', () => {
         stub = findRenderedComponentWithType(container, Passthrough);
     });
 
-    it('should set props.BEM', () => {
-        expect(stub.props.BEM).to.be.a('object');
-    });
-
-    it('should set props.BEM.className', () => {
-        expect(stub.props.BEM.className).to.be.a('string');
-        expect(stub.props.BEM.className).to.equal('mockClassName__mockChildClassName');
-    });
-
-    it('should set props.BEM.elements', () => {
+    it('should not BEM.className with its parent', () => {
         const { props: { BEM } } = stub;
-        expect(BEM.elements.foo).to.equal('mockClassName__mockChildClassName__foo');
-        expect(BEM.elements.bar).to.equal('mockClassName__mockChildClassName__bar');
+
+        expect(BEM).to.be.a('object');
+        expect(BEM.className).to.equal('mockChildClassName');
+
     });
 
-    it('should extends props.BEM.class by its modifiers', () => {
-        const container = renderIntoDocument(<Parent modified />);
-        stub = findRenderedComponentWithType(container, Passthrough);
-
-        expect(stub.props.BEM.className).to.be.a('string');
-        expect(stub.props.BEM.className).to.equal(
-            'mockClassName__mockChildClassName mockClassName__mockChildClassName--modified'
-        );
-    });
 });
+
 
