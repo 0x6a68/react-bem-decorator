@@ -81,9 +81,14 @@ function BEMComposer(className, settings) {
             ? className
             : composeFinalClassName(context[CLASSNAME_KEY], className);
 
+        const originalClassName = props.className;
 
         return {
-            className: composeModifiers(finalClassName, modifiers, props),
+            className: [
+                originalClassName,
+                composeModifiers(finalClassName, modifiers, props)
+            ].filter(str => str)
+            .join(' '),
             elements: composeElements(finalClassName, elements)
         }
     }

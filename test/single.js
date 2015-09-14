@@ -93,12 +93,19 @@ describe('single component without inheritance', () => {
     });
 
     it('should set modifier classnames even no modifier func is defined', () => {
-
         const container = renderIntoDocument(<ContainerWithoutModifierFunc modifiers="modified" />);
         stub = findRenderedComponentWithType(container, Passthrough);
 
         const { props: { BEM } } = stub;
         expect(BEM.className).to.equal('mockClassName mockClassName--modified');
+    });
+
+    it('should prepend components className', () => {
+        const container = renderIntoDocument(<Container className="container" />);
+        stub = findRenderedComponentWithType(container, Passthrough);
+
+        const { props: { BEM } } = stub;
+        expect(BEM.className).to.equal('container mockClassName');
     });
 
 });
