@@ -20,10 +20,13 @@ function _invariant(condition, format = '', ...vars) {
     );
 }
 
-function filterByTruthy(obj, defaultModifiers = []) {
+function filterByTruthy(objOrArr, defaultModifiers = []) {
     // poormans Object.entries().filter...
-    return Object.keys(obj).reduce((result, key) => {
-        const value = obj[key];
+    if (Array.isArray(objOrArr)) {
+        return objOrArr;
+    }
+    return Object.keys(objOrArr).reduce((result, key) => {
+        const value = objOrArr[key];
         return (value) ? result.concat([key]) : result
     }, defaultModifiers);
 }

@@ -125,8 +125,27 @@ describe('single component without inheritance', () => {
             states(props) {
                 const { active, disabled } = props;
                 return {
-                    active, disabled
+                    active,
+                    disabled
                 }
+            }
+        })
+        class Container extends Component {
+            render() {
+                return <Passthrough {...this.props} />;
+            }
+        }
+        const container = renderIntoDocument(<Container active disabled/>);
+        stub = findRenderedComponentWithType(container, Passthrough);
+
+        const { props: { BEM } } = stub;
+        expect(BEM.className).to.equal('active disabled');
+    });
+
+    it('should handle array className', () => {
+        @BEMDecorator('', {
+            states() {
+                return ['active', 'disabled']
             }
         })
         class Container extends Component {
