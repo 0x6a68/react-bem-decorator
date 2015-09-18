@@ -73,7 +73,7 @@ function BEMComposer(className, settings) {
 export default function BEMDecorator(className, settings = {}) {
     const composeBEM = BEMComposer(className, settings);
 
-    return (TargetComponent) => class BEMDecorator extends Component {
+    return (TargetComponent) => class BEMDecorator extends TargetComponent {
 
         static propTypes = typesSpec;
         static contextTypes = typesSpec;
