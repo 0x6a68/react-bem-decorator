@@ -90,12 +90,8 @@ export default function BEMDecorator(className, settings = {}) {
             }
         }
 
-        render() {
-            const { props, context } = this;
-
-            return (
-                <TargetComponent { ...props } BEM={ composeBEM(props, context) } />
-            );
-        };
+        get BEM() {
+            return composeBEM(this.props, this.context)
+        }
     }
 }
