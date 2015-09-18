@@ -73,11 +73,12 @@ function BEMComposer(className, settings) {
 export default function BEMDecorator(className, settings = {}) {
     const composeBEM = BEMComposer(className, settings);
 
-    return (TargetComponent) => class BEMDecorator extends Component {
+    return (TargetComponent) => class BEMDecorator extends TargetComponent {
 
         static propTypes = typesSpec;
         static contextTypes = typesSpec;
         static childContextTypes = typesSpec;
+        static displayName = TargetComponent.displayName || TargetComponent.name;
 
         getChildContext() {
             const { isBlock } = settings;
@@ -90,12 +91,9 @@ export default function BEMDecorator(className, settings = {}) {
             }
         }
 
-        render() {
+        get BEM() {
             const { props, context } = this;
-
-            return (
-                <TargetComponent { ...props } BEM={ composeBEM(props, context) } />
-            );
-        };
+            return composeBEM(props, context);
+        }
     }
 }
