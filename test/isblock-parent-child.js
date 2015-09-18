@@ -7,13 +7,6 @@ import {
 
 import BEMDecorator from '../src';
 
-// fixture
-class Passthrough extends Component {
-    render() {
-        return <div {...this.props} />;
-    }
-}
-
 @BEMDecorator('mockClassName', {
     isBlock: true,
     modifiers(props) {
@@ -38,21 +31,21 @@ class Parent extends Component {
 })
 class Child extends Component {
     render() {
-        return <Passthrough {...this.props} />;
+        return <div />;
     }
 }
 
 //const BEMComponent = BEMDecorator('stirng', {})(SimpleFixtureComponent);
 describe('parent child using context', () => {
-    let stub;
+    let container;
 
     before(() => {
-        const container = renderIntoDocument(<Parent />);
-        stub = findRenderedComponentWithType(container, Passthrough);
+        const parent = renderIntoDocument(<Parent />);
+        container = findRenderedComponentWithType(parent, Child);
     });
 
     it('should not BEM.className with its parent', () => {
-        const { props: { BEM } } = stub;
+        const { BEM } = container;
 
         expect(BEM).to.be.a('object');
         expect(BEM.className).to.equal('mockChildClassName');

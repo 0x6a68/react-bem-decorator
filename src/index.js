@@ -78,6 +78,7 @@ export default function BEMDecorator(className, settings = {}) {
         static propTypes = typesSpec;
         static contextTypes = typesSpec;
         static childContextTypes = typesSpec;
+        static displayName = TargetComponent.displayName || TargetComponent.name;
 
         getChildContext() {
             const { isBlock } = settings;
@@ -91,7 +92,8 @@ export default function BEMDecorator(className, settings = {}) {
         }
 
         get BEM() {
-            return composeBEM(this.props, this.context)
+            const { props, context } = this;
+            return composeBEM(props, context);
         }
     }
 }

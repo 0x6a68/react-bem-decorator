@@ -6,7 +6,7 @@
   "scripts": {
     "prepublish": "npm run build",
     "start": "npm run test -- --watch",
-    "test": "mocha --reporter min --require babel/register --require test/utils/dom.js",
+    "test": "mocha --reporter spec --require babel/register --require test/utils/dom.js",
     "build": "babel src --out-dir lib"
   },
   "repository": {

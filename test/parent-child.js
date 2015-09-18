@@ -7,13 +7,6 @@ import {
 
 import BEMDecorator from '../src';
 
-// fixture
-class Passthrough extends Component {
-    render() {
-        return <div {...this.props} />;
-    }
-}
-
 @BEMDecorator('mockClassName', {
     modifiers(props) {
         const { modified } = props;
@@ -36,42 +29,40 @@ class Parent extends Component {
 })
 class Child extends Component {
     render() {
-        return <Passthrough {...this.props} />;
+        return <div />;
     }
 }
 
-//const BEMComponent = BEMDecorator('stirng', {})(SimpleFixtureComponent);
 describe('parent child using context', () => {
-    let stub;
+    let container;
 
     before(() => {
-        const container = renderIntoDocument(<Parent />);
-        stub = findRenderedComponentWithType(container, Passthrough);
+        const parent = renderIntoDocument(<Parent />);
+        container = findRenderedComponentWithType(parent, Child);
     });
 
     it('should set props.BEM', () => {
-        expect(stub.props.BEM).to.be.a('object');
+        expect(container.BEM).to.be.a('object');
     });
 
     it('should set props.BEM.className', () => {
-        expect(stub.props.BEM.className).to.be.a('string');
-        expect(stub.props.BEM.className).to.equal('mockClassName__mockChildClassName');
+        expect(container.BEM.className).to.be.a('string');
+        expect(container.BEM.className).to.equal('mockClassName__mockChildClassName');
     });
 
     it('should set props.BEM.elements', () => {
-        const { props: { BEM } } = stub;
+        const { BEM } = container;
         expect(BEM.elements.foo).to.equal('mockClassName__mockChildClassName__foo');
         expect(BEM.elements.bar).to.equal('mockClassName__mockChildClassName__bar');
     });
 
     it('should extends props.BEM.class by its modifiers', () => {
-        const container = renderIntoDocument(<Parent modified />);
-        stub = findRenderedComponentWithType(container, Passthrough);
+        const parent = renderIntoDocument(<Parent modified />);
+        container = findRenderedComponentWithType(parent, Child);
 
-        expect(stub.props.BEM.className).to.be.a('string');
-        expect(stub.props.BEM.className).to.equal(
+        expect(container.BEM.className).to.be.a('string');
+        expect(container.BEM.className).to.equal(
             'mockClassName__mockChildClassName mockClassName__mockChildClassName--modified'
         );
     });
 });
-
