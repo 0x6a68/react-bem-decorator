@@ -1,8 +1,9 @@
 import React, { Component, PropTypes } from 'react';
 
 import {
+    curry,
     invoke,
-    concatAndFilterString,
+    filterAndConcatWithSeperator,
     invariant,
     filterByTruthy
 } from './utils'
@@ -13,6 +14,11 @@ const EMPTY_SEPERATOR = ' ';
 const CLASSNAME_KEY = '__BEMClassName__';
 const typesSpec = { [CLASSNAME_KEY]: PropTypes.string };
 
+const composeEmpty = curry(filterAndConcatWithSeperator)(EMPTY_SEPERATOR);
+const composeElement = curry(filterAndConcatWithSeperator)(BEM_ELEMENT_SEPERATOR);
+const composeModifier = curry(filterAndConcatWithSeperator)(BEM_MODIFIER_SEPERATOR);
+console.log('000000000000', composeEmpty);
+
 const composeElements = (className, elements) => {
     if (!elements) {
         return;
@@ -22,10 +28,6 @@ const composeElements = (className, elements) => {
         return result;
     }, {});
 }
-
-const composeEmpty = concatAndFilterString(EMPTY_SEPERATOR);
-const composeElement = concatAndFilterString(BEM_ELEMENT_SEPERATOR);
-const composeModifier = concatAndFilterString(BEM_MODIFIER_SEPERATOR);
 
 const composeStates = (fn, args) => composeEmpty(...filterByTruthy(invoke(fn, args)));
 const composeModifiers = (fn, props) => {
