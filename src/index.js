@@ -76,8 +76,8 @@ export default function BEMDecorator(className, settings = {}) {
     return (TargetComponent) => class BEMDecorator extends TargetComponent {
 
         static propTypes = typesSpec;
-        static contextTypes = typesSpec;
-        static childContextTypes = typesSpec;
+        static contextTypes = { ...TargetComponent.contextTypes, ...typesSpec };
+        static childContextTypes = { ...TargetComponent.childContextTypes, ...typesSpec };
         static displayName = TargetComponent.displayName || TargetComponent.name;
 
         getChildContext() {
