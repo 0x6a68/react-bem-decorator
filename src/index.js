@@ -4,9 +4,9 @@ import {
     invoke,
     concatAndFilterString,
     invariant,
-    filterByTruthy
-} from './utils'
-
+    filterByTruthy,
+    extend
+} from './utils';
 const BEM_ELEMENT_SEPERATOR = '__';
 const BEM_MODIFIER_SEPERATOR = '--';
 const EMPTY_SEPERATOR = ' ';
@@ -73,27 +73,30 @@ function BEMComposer(className, settings) {
 export default function BEMDecorator(className, settings = {}) {
     const composeBEM = BEMComposer(className, settings);
 
-    return (TargetComponent) => class BEMDecorator extends TargetComponent {
+    return (TargetComponent) => {
 
-        static propTypes = typesSpec;
-        static contextTypes = { ...TargetComponent.contextTypes, ...typesSpec };
-        static childContextTypes = { ...TargetComponent.childContextTypes, ...typesSpec };
-        static displayName = TargetComponent.displayName || TargetComponent.name;
+        const types = {
+            propTypes: typesSpec,
+            childContextTypes: typesSpec,
+            contextTypes: typesSpec
+        };
 
-        getChildContext() {
-            const { isBlock } = settings;
-            const currentClassName = this.context[CLASSNAME_KEY];
+        const methods = {
+            get BEM() {
+                const { props, context } = this;
+                return composeBEM(props, context);
+            },
 
-            return {
-                [CLASSNAME_KEY]: (isBlock)
-                    ? className
-                    : composeElement(currentClassName, className)
+            getChildContext() {
+                return {
+                    [ CLASSNAME_KEY ]: className
+                }
             }
         }
 
-        get BEM() {
-            const { props, context } = this;
-            return composeBEM(props, context);
-        }
-    }
+        extend(TargetComponent, types);
+        extend(TargetComponent.prototype, methods);
+
+        return TargetComponent;
+    };
 }

@@ -2,6 +2,19 @@ function uniqueString(value, index, self) {
     return self.indexOf(value) === index;
 }
 
+export function extend (obj) {
+    Array.prototype.slice.call(arguments, 1).forEach(function(source) {
+        var descriptor, prop;
+        if (source) {
+            for (prop in source) {
+                descriptor = Object.getOwnPropertyDescriptor(source, prop);
+                Object.defineProperty(obj, prop, descriptor);
+            }
+        }
+    });
+    return obj;
+};
+
 export function invoke(fn, args) {
     return (typeof fn === 'function') && fn(args);
 }

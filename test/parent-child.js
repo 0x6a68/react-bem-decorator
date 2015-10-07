@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { expect } from 'chai';
 import {
     renderIntoDocument,
@@ -28,6 +28,10 @@ class Parent extends Component {
     elements: [ 'foo', 'bar' ]
 })
 class Child extends Component {
+    static propTypes = {
+        foo: PropTypes.string
+    };
+
     render() {
         return <div />;
     }
